@@ -4,11 +4,11 @@ from imread_from_url import imread_from_url
 from yolov8 import YOLOv8
 
 # Initialize yolov8 object detector
-model_path = "models/yolov8m.onnx"
+model_path = "models/best.onnx"
 yolov8_detector = YOLOv8(model_path, conf_thres=0.2, iou_thres=0.3)
 
 # Read image
-img_url = "https://live.staticflickr.com/13/19041780_d6fd803de0_3k.jpg"
+img_url = "https://dedemaker-1255717351.cos.ap-nanjing.myqcloud.com/%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93/merged_merged_4942.jpg"
 img = imread_from_url(img_url)
 
 # Detect Objects
