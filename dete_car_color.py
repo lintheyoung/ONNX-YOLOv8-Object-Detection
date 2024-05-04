@@ -130,7 +130,7 @@ class VideoMainWindow(QMainWindow):
     # 发送数据函数
     def send_data(self, data):
         self.ser.write(data.encode())  # 将字符串编码发送
-        time.sleep(0.2)  # 每隔0.2秒发送一次
+        # time.sleep(0.2)  # 每隔0.2秒发送一次
 
     # 根据用户选择初始化串口
     def initSerial(self, port):
@@ -240,11 +240,9 @@ class VideoMainWindow(QMainWindow):
             data = json.dumps({"red_x": red_x, "red_y": red_y, "green_x": green_x, "green_y": green_y, "blue_x": blue_x, "blue_y": blue_y, "yellow_x": yellow_x, "yellow_y": yellow_y})  # 根据需要修改数据
             self.send_data(data + '\n')  # 加上换行符，方便ESP32端解析
             
-            # 读取来自ESP32的数据
-            if self.ser.in_waiting:
-                line = self.ser.readline().decode('utf-8').strip()
-                if line:
-                    print("Received:", line)   
+            print(data)
+
+            
 
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # 在这里添加BGR到RGB的转换
@@ -264,6 +262,12 @@ class VideoMainWindow(QMainWindow):
         self.scale_h = h / pixmap.height()
 
         self.labelImage.setPixmap(pixmap)
+
+        # 读取来自ESP32的数据
+        if self.ser.in_waiting:
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
 
 
     def getMousePosition(self, event):
