@@ -46,11 +46,10 @@ class InitDialog(QDialog):
 
     # 填充摄像头选择
     def populateCameraChoices(self):
+        self.cameraComboBox.addItem("无")  # 添加“无”选项
         # 简单的方法是尝试打开摄像头，直到失败。这里假设最多尝试10个ID。
         for i in range(10):
-            print("opening")
             cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)
-            print("opening OK")
             if cap.isOpened():
                 self.cameraComboBox.addItem(f"摄像头 {i}")
                 cap.release()
@@ -64,7 +63,7 @@ class InitDialog(QDialog):
             self.serialComboBox.addItem(port.device)
 
 
-
+number = 0
 
 class VideoMainWindow(QMainWindow):
     def __init__(self):
@@ -75,8 +74,17 @@ class VideoMainWindow(QMainWindow):
 
         # 在这里调用初始化对话框
         initDialog = InitDialog()
+
+        self.title = '摄像头识别位置识别程序（VerCalico）'
+        self.left = 100
+        self.top = 100
+        self.width = 1280
+        self.height = 960
+        self.initUI()
+
+
         if initDialog.exec_():
-            cameraIndex = initDialog.cameraComboBox.currentIndex()
+            cameraIndex = initDialog.cameraComboBox.currentIndex() - 1  # 调整index，因为新增了“无”
             serialPort = initDialog.serialComboBox.currentText()
 
             msgBox.setWindowTitle("模型加载中")
@@ -91,14 +99,7 @@ class VideoMainWindow(QMainWindow):
             sys.exit()  # 如果用户取消，则退出程序
 
         
-        
 
-        self.title = '摄像头识别位置识别程序（VerCalico）'
-        self.left = 100
-        self.top = 100
-        self.width = 1280
-        self.height = 960
-        self.initUI()
         # self.cap = cv2.VideoCapture(0)  # 使用第一个摄像头
         self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
@@ -112,8 +113,6 @@ class VideoMainWindow(QMainWindow):
         self.scale_w = 1
         self.scale_h = 1
 
-        
-
         # 初始化YOLOv8对象检测器
         model_path = "models/best.onnx"  # 根据实际模型路径调整  
         self.yolov8_detector = YOLOv8(model_path, conf_thres=0.6, iou_thres=0.5)
@@ -123,7 +122,16 @@ class VideoMainWindow(QMainWindow):
 
     # 根据用户选择初始化摄像头
     def initCamera(self, index):
+        if index == -1:  # 如果选择了“无”
+            self.camera_index = -1
+            self.btnInfo.show()  # 显示按钮
+            self.btnExit.hide()
+            return
+        
+        self.camera_index = index
         self.cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
+        self.btnInfo.show()  # 隐藏按钮，如果选择了有效的摄像头
+        self.btnExit.hide()
         
         # self.cap = cv2.VideoCapture(index)
 
@@ -149,7 +157,97 @@ class VideoMainWindow(QMainWindow):
         self.labelImage.setMouseTracking(True)
         self.labelImage.mousePressEvent = self.getMousePosition
 
+        # 添加按钮
+        self.btnInfo = QPushButton("机器人启动", self)
+        self.btnInfo.move(20, 920)  # 设置按钮位置
+        self.btnInfo.clicked.connect(self.showInfo)  # 连接信号
+
+        self.btnExit = QPushButton("退出程序", self)
+        self.btnExit.move(200, 920)  # 设置按钮位置
+        self.btnExit.clicked.connect(self.exitApp)  # 连接信号
+
+        self.btnInfo.hide()  # 默认隐藏
+        self.btnExit.hide()  # 默认隐藏
+
+    def showInfo(self):
+        data = json.dumps({"red_x": -1, "red_y": -1, "green_x": -1, "green_y": -1, "blue_x": -1, "blue_y": -1, "yellow_x": -1, "yellow_y": -1})  # 根据需要修改数据
+        self.send_data(data + '\n')  # 加上换行符，方便ESP32端解析
+        print(data)
+        
+
+        # 读取来自ESP32的数据
+        if self.ser.in_waiting:
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
+
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
+
+        time.sleep(0.2)
+
+        data = json.dumps({"red_x": -1, "red_y": -1, "green_x": -1, "green_y": -1, "blue_x": -1, "blue_y": -1, "yellow_x": -1, "yellow_y": -1})  # 根据需要修改数据
+        self.send_data(data + '\n')  # 加上换行符，方便ESP32端解析
+        print(data)
+        
+
+        # 读取来自ESP32的数据
+        if self.ser.in_waiting:
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
+
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
+
+        time.sleep(0.2)
+
+        data = json.dumps({"red_x": -1, "red_y": -1, "green_x": -1, "green_y": -1, "blue_x": -1, "blue_y": -1, "yellow_x": -1, "yellow_y": -1})  # 根据需要修改数据
+        self.send_data(data + '\n')  # 加上换行符，方便ESP32端解析
+        print(data)
+        
+
+        # 读取来自ESP32的数据
+        if self.ser.in_waiting:
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
+
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
+        
+        time.sleep(0.2)
+
+        data = json.dumps({"red_x": -1, "red_y": -1, "green_x": -1, "green_y": -1, "blue_x": -1, "blue_y": -1, "yellow_x": -1, "yellow_y": -1})  # 根据需要修改数据
+        self.send_data(data + '\n')  # 加上换行符，方便ESP32端解析
+        print(data)
+        
+
+        # 读取来自ESP32的数据
+        if self.ser.in_waiting:
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
+
+            line = self.ser.readline().decode('utf-8').strip()
+            if line:
+                print("Received:", line)
+
+        QMessageBox.information(self, "机器人", "机器人启动")
+
+    def exitApp(self):
+        data = json.dumps({"red_x": -1, "red_y": -1, "green_x": -1, "green_y": -1, "blue_x": -1, "blue_y": -1, "yellow_x": -1, "yellow_y": -1})  # 根据需要修改数据
+        self.send_data(data + '\n')  # 加上换行符，方便ESP32端解析
+        print(data)
+        QMessageBox.information(self, "信息2", "这是一个信息2显示按钮。")
+
     def updateFrame(self):
+        if self.camera_index == -1:  # 如果选择了“无”
+            return  # 不进行任何操作，直接返回
+    
         ret, frame = self.cap.read()
         if ret:
             # 旋转90度
@@ -162,6 +260,7 @@ class VideoMainWindow(QMainWindow):
                 self.displayImage(frame, transform=self.transform_ready)
 
     def displayImage(self, frame, transform=False):
+        global number
         if transform and len(self.points) == 4:
             # 应用透视变换
             pts1 = np.float32(self.points)
@@ -237,7 +336,8 @@ class VideoMainWindow(QMainWindow):
                 
             # 自定义JSON数据
             # 发送所有的位置
-            data = json.dumps({"red_x": red_x, "red_y": red_y, "green_x": green_x, "green_y": green_y, "blue_x": blue_x, "blue_y": blue_y, "yellow_x": yellow_x, "yellow_y": yellow_y})  # 根据需要修改数据
+            number += 1
+            data = json.dumps({"red_x": red_x, "red_y": red_y, "green_x": green_x, "green_y": green_y, "blue_x": blue_x, "blue_y": blue_y, "yellow_x": yellow_x, "yellow_y": yellow_y, "counter": number})  # 根据需要修改数据
             self.send_data(data + '\n')  # 加上换行符，方便ESP32端解析
             
             print(data)

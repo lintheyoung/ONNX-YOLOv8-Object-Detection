@@ -67,3 +67,5 @@ The original YOLOv8 model can be found in this repository: [YOLOv8 Repository](h
 * YOLOv7 model: [https://github.com/WongKinYiu/yolov7](https://github.com/WongKinYiu/yolov7)
 * PINTO0309's model zoo: [https://github.com/PINTO0309/PINTO_model_zoo](https://github.com/PINTO0309/PINTO_model_zoo)
 * PINTO0309's model conversion tool: [https://github.com/PINTO0309/openvino2tensorflow](https://github.com/PINTO0309/openvino2tensorflow)
+
+nuitka --onefile --windows-icon-from-ico=YOLO_Logo.ico --plugin-enable=pyqt5 dete_car_color.py
